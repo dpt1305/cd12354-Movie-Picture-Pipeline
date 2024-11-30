@@ -6,9 +6,16 @@ on:
     paths:
       - starter/frontend/**
       - .github/workflows/frontend-ci.yaml
+  push:
+    branches:
+      - fe-ci-2
+      - main
+    paths:
+      - starter/frontend/**
+      - .github/workflows/frontend-ci.yaml
 env:
-  nodeVersion: 20
- 
+  NODE_VERSION: 20
+
 jobs:
   lint_job:
     runs-on: ubuntu-latest
@@ -45,7 +52,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: ${{nodeVersion}}
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Cache Node.js modules
         uses: actions/cache@v3
