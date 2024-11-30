@@ -1,14 +1,14 @@
 name: Continuous Integration workflow
 
 on:
-  pull_requests:
+  pull_request:
     branches: [main]
     paths:
       - starter/frontend/**
       - .github/workflows/frontend-ci.yaml
 env:
   nodeVersion: 20
-
+ 
 jobs:
   lint_job:
     runs-on: ubuntu-latest
