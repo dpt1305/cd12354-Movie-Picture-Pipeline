@@ -2,7 +2,7 @@ name: Continuous Integration workflow
 
 on:
   pull_requests:
-    branches: [master]
+    branches: [main]
     paths:
       - starter/frontend/**
       - .github/workflows/frontend-ci.yaml
