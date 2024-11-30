@@ -6,6 +6,12 @@ on:
     paths:
       - starter/frontend/**
       - .github/workflows/frontend-ci.yaml
+  push:
+    branches:
+      - fe-ci-2
+    paths:
+      - starter/frontend/**
+      - .github/workflows/frontend-ci.yaml
 env:
   NODE_VERSION: 20
 
