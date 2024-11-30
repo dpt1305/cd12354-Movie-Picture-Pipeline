@@ -7,7 +7,7 @@ on:
       - starter/frontend/**
       - .github/workflows/frontend-ci.yaml
 env:
-  nodeVersion: 20
+  NODE_VERSION: 20
 
 jobs:
   lint_job:
@@ -45,7 +45,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: ${{nodeVersion}}
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Cache Node.js modules
         uses: actions/cache@v3
