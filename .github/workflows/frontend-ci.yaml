@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - fe-ci-2
+      - main
     paths:
       - starter/frontend/**
       - .github/workflows/frontend-ci.yaml
