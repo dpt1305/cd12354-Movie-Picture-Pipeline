@@ -95,3 +95,4 @@ jobs:
           region: us-east-1
           dockerfile: starter/frontend/Dockerfile
           context: starter/frontend
+          build_args: "REACT_APP_MOVIE_API_URL=${{ vars.REACT_APP_MOVIE_API_URL }}"
