@@ -1,0 +1,103 @@
+name: Backend Continuous Integration
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - starter/backend/**
+      - .github/workflows/backend-ci.yaml
+
+env:
+  PYTHON_VERSION: '3.10' 
+  BACKEND_REPO: "backend"
+  BACKEND_REGISTRY: "918780285974.dkr.ecr.us-east-1.amazonaws.com"
+
+jobs:
+  lint-job:
+    name: Lint Job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pipenv' 
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/virtualenvs/
+          key: lint-${{ runner.os }}-node-${{ hashFiles('**/Pipfile.lock') }}
+
+      - name: Install pipenv
+        run: curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
+
+      - name: Install Dependencies
+        working-directory: starter/backend
+        run: | 
+          pipenv install --dev
+
+      - name: Run Lint
+        working-directory: starter/backend
+        run: | 
+          pipenv run lint
+
+  test-job:
+    name: Test Job
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pipenv' 
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/virtualenvs/
+          key: lint-${{ runner.os }}-node-${{ hashFiles('**/Pipfile.lock') }}
+
+      - name: Install pipenv
+        run: curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
+
+      - name: Install Dependencies
+        working-directory: starter/backend
+        run: | 
+          pipenv install --dev
+
+      - name: Run tests
+        working-directory: starter/backend
+        run: pipenv run test
+
+  build-job:
+    name: Build Job
+    runs-on: ubuntu-latest
+    needs: [lint-job, test-job]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Commit tag
+        id: get-commit-tag
+        run: echo "commit-hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      
+      - name: Build and upload image to ECR
+        uses: appleboy/docker-ecr-action@master
+        with:
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          registry: ${{ env.BACKEND_REGISTRY }}
+          tags: "lastest, ${{ steps.get-commit-tag.outputs.commit-hash }}"
+          repo: ${{ env.BACKEND_REPO }}
+          region: us-east-1
+          dockerfile: starter/backend/Dockerfile
+          context: starter/backend
