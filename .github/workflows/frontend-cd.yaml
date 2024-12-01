@@ -120,7 +120,7 @@ jobs:
         run: |
           aws sts get-caller-identity
 
-      - name: eks update config kube
+      - name: Update config kube
         run: | 
           aws eks update-kubeconfig --region us-east-1 --name ${{env.CLUSTER_NAME}}
 
@@ -134,8 +134,9 @@ jobs:
         env:
           IMAGE_URL: ${{ vars.REGISTRY }}/${{ vars.REPO_FRONTEND }}:${{ needs.build-job.outputs.IMAGE_TAG }}
         run: |
-          echo "${{ env.IMAGE_URL }}"
-          kustomize edit set image frontend=${{ env.IMAGE_URL }}
+          IMAGE_URL=${{ vars.REGISTRY }}/${{ vars.REPO_FRONTEND }}:${{ needs.build-job.outputs.IMAGE_TAG }};
+          echo $IMAGE_URL
+          kustomize edit set image frontend=$IMAGE_URL
 
       - name: Apply the manifests to the cluster
         working-directory: starter/frontend/k8s
