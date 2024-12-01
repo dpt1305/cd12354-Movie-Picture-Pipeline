@@ -136,9 +136,9 @@ jobs:
       - name: Set the image tag to the newer version
         working-directory: starter/frontend/k8s
         env:
-          IMAGE_URL: ${{ vars.FRONTEND_REGISTRY }}/${{ vars.FRONTEND_REPO }}:${{ steps.get-commit-tag.outputs.commit-hash }}
+          IMAGE_URL: ${{ env.FRONTEND_REGISTRY }}/${{ env.FRONTEND_REPO }}:${{ steps.get-commit-tag.outputs.commit-hash }}
         run: |
-          echo "${{ vars.FRONTEND_REGISTRY }}/${{ vars.FRONTEND_REPO }}: ${{ steps.get-commit-tag.outputs.commit-hash }}"
+          echo "${{ env.FRONTEND_REGISTRY }}/${{ env.FRONTEND_REPO }}:${{ steps.get-commit-tag.outputs.commit-hash }}"
           echo ${{ env.IMAGE_URL }}
           kustomize edit set image frontend=$IMAGE_URL
 
