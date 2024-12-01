@@ -16,7 +16,7 @@ on:
 env:
   NODE_VERSION: 20
   FRONTEND_REPO: "frontend"
-  FRONTEND_REGISTRY: "918780285974.dkr.ecr.us-east-1.amazonaws.com/frontend"
+  FRONTEND_REGISTRY: "918780285974.dkr.ecr.us-east-1.amazonaws.com"
 
 jobs:
   lint-job:
