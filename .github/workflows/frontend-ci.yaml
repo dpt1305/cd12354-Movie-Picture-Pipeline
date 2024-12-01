@@ -86,11 +86,11 @@ jobs:
 
       - name: Get timestamp
         id: get-timestamp
-        run: echo "::set-output name=timestamp::$(date +'%Y-%m-%d-%H-%M')"
+        run: echo "timestamp=$(date +'%Y-%m-%d-%H-%M')" >> $GITHUB_OUTPUT
 
       - name: Get commit hash
         id: get-commit-hash
-        run: echo "::set-output name=commit-hash::$(git rev-parse --short HEAD)"
+        run: echo "commit-hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
   #     # Step 2: Setup Node.js
   #     - name: Setup Node.js
