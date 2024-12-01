@@ -1,0 +1,125 @@
+name: Frontend Continuous Deployment
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - starter/frontend/**
+      - .github/workflows/frontend-cd.yaml
+      
+env:
+  NODE_VERSION: 20
+  FRONTEND_REPO: "frontend"
+  FRONTEND_REGISTRY: "918780285974.dkr.ecr.us-east-1.amazonaws.com"
+  CLUSTER_NAME: "cluster"
+
+jobs:
+  lint-job:
+    name: Lint Job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        working-directory: starter/frontend
+        run: |
+          npm ci
+
+      - name: Run lint
+        working-directory: starter/frontend
+        run: npm run lint
+
+  test-job:
+    name: Test Job
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        working-directory: starter/frontend
+        run: npm ci
+
+      - name: Run tests
+        working-directory: starter/frontend
+        run: npm run test
+
+  build-job:
+    name: Build Job
+    runs-on: ubuntu-latest
+    needs: [lint-job, test-job]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Commit tag
+        id: get-commit-tag
+        run: echo "commit-hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      
+      - name: Build and upload image to ECR
+        uses: appleboy/docker-ecr-action@master
+        with:
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          registry: ${{ env.FRONTEND_REGISTRY }}
+          tags: "lastest, ${{ steps.get-commit-tag.outputs.commit-hash }}"
+          repo: ${{ env.FRONTEND_REPO }}
+          region: us-east-1
+          dockerfile: starter/frontend/Dockerfile
+          context: starter/frontend
+          build_args: "REACT_APP_MOVIE_API_URL=${{ vars.REACT_APP_MOVIE_API_URL }}"
+    outputs:
+      IMAG_TAG: ${{ steps.get-commit-tag.outputs.commit-hash }}"
+  
+  deploy-job:
+    name: Deploy job
+    runs-on: ubuntu-latest
+    needs: [build-job]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      
+      - name: Check credentials
+        run: |
+          aws sts get-caller-identity
+
+      - name: eks update config kube
+        run: | 
+          aws eks update-kubeconfig --region us-east-1 --name ${{env.CLUSTER_NAME}}
