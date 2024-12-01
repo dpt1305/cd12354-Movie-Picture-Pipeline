@@ -6,13 +6,7 @@ on:
     paths:
       - starter/backend/**
       - .github/workflows/backend-ci.yaml
-  push:
-    branches:
-      - be-ci-1
-      - main
-    paths:
-      - starter/backend/**
-      - .github/workflows/backend-ci.yaml
+
 env:
   PYTHON_VERSION: '3.10' 
   BACKEND_REPO: "backend"
