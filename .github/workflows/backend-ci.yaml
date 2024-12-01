@@ -83,27 +83,27 @@ jobs:
         working-directory: starter/backend
         run: pipenv run test
 
-  # build-job:
-  #   name: Build Job
-  #   runs-on: ubuntu-latest
-  #   needs: [lint-job, test-job]
+  build-job:
+    name: Build Job
+    runs-on: ubuntu-latest
+    needs: [lint-job, test-job]
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  #     - name: Commit tag
-  #       id: get-commit-tag
-  #       run: echo "commit-hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      - name: Commit tag
+        id: get-commit-tag
+        run: echo "commit-hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
       
-  #     - name: Build and upload image to ECR
-  #       uses: appleboy/docker-ecr-action@master
-  #       with:
-  #         access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         registry: ${{ env.BACKEND_REGISTRY }}
-  #         tags: "lastest, ${{ steps.get-commit-tag.outputs.commit-hash }}"
-  #         repo: ${{ env.BACKEND_REPO }}
-  #         region: us-east-1
-  #         dockerfile: starter/backend/Dockerfile
-  #         context: starter/backend
+      - name: Build and upload image to ECR
+        uses: appleboy/docker-ecr-action@master
+        with:
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          registry: ${{ env.BACKEND_REGISTRY }}
+          tags: "lastest, ${{ steps.get-commit-tag.outputs.commit-hash }}"
+          repo: ${{ env.BACKEND_REPO }}
+          region: us-east-1
+          dockerfile: starter/backend/Dockerfile
+          context: starter/backend
