@@ -132,7 +132,7 @@ jobs:
       - name: Set the image tag to the newer version
         working-directory: starter/frontend/k8s
         env:
-          IMAGE_URL: ${{ vars.REGISTRY }}/${{ vars.REPO_FRONTEND }}:${{ needs.build-job.outputs.IMAGE_TAG }}
+          IMAGE_URL: ${{ vars.REGISTRY }}/${{ vars.REPO_FRONTEND }}:${{ jobs.build-job.outputs.IMAGE_TAG }}
         run: |
           echo "${{ env.IMAGE_URL }}"
           kustomize edit set image frontend=${{ env.IMAGE_URL }}
