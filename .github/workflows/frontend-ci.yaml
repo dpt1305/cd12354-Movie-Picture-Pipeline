@@ -86,9 +86,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Git tag
-        id: get-git-tag
-        run: echo "GIT_TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+      - name: Commit tag
+        id: get-commit-tag
+        run: echo "commit-hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
       
       - name: Build and upload image to ECR
         uses: appleboy/docker-ecr-action@master
@@ -96,7 +96,8 @@ jobs:
           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           registry: ${{ env.FRONTEND_REGISTRY }}
-          tags: ${{ env.GIT_TAG }}
+          # tags: "latest, ${{ steps.get-commit-hash.outputs.commit-hash }}-${{ steps.get-timestamp.outputs.timestamp }}"
+          tags: "lastest, ${{ steps.get-commit-tag.outputs.commit-hash }}"
           repo: ${{ env.FRONTEND_REPO }}
           region: us-east-1
           dockerfile: starter/frontend/Dockerfile
