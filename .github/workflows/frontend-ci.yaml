@@ -1,4 +1,4 @@
-name: Continuous Integration workflow
+name: Frontend Continuous Integration
 
 on:
   pull_request:
