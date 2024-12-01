@@ -51,34 +51,37 @@ jobs:
         run: | 
           pipenv run lint
 
-  # test-job:
-  #   name: Test Job
-  #   runs-on: ubuntu-latest
+  test-job:
+    name: Test Job
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: ${{ env.NODE_VERSION }}
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pipenv' 
 
-  #     - name: Cache Node.js modules
-  #       uses: actions/cache@v4
-  #       with:
-  #         path: ~/.npm
-  #         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-node-
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/virtualenvs/
+          key: lint-${{ runner.os }}-node-${{ hashFiles('**/Pipfile.lock') }}
 
-  #     - name: Install dependencies
-  #       working-directory: starter/backend
-  #       run: npm ci
+      - name: Install pipenv
+        run: curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
 
-  #     - name: Run tests
-  #       working-directory: starter/backend
-  #       run: npm run test
+      - name: Install Dependencies
+        working-directory: starter/backend
+        run: | 
+          pipenv install --dev
+
+      - name: Run tests
+        working-directory: starter/backend
+        run: pipenv run test
 
   # build-job:
   #   name: Build Job
