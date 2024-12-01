@@ -129,13 +129,17 @@ jobs:
         with:
           kustomize-version: 5.0.1
 
+      - name: Commit tag
+        id: get-commit-tag
+        run: echo "commit-hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       - name: Set the image tag to the newer version
         working-directory: starter/frontend/k8s
         env:
-          IMAGE_URL: ${{ vars.REGISTRY }}/${{ vars.REPO_FRONTEND }}:${{ needs.build-job.outputs.IMAGE_TAG }}
+          IMAGE_URL: ${{ vars.FRONTEND_REGISTRY }}/${{ vars.FRONTEND_REPO }}:${{ steps.get-commit-tag.outputs.commit-hash }}
         run: |
-          IMAGE_URL=${{ vars.REGISTRY }}/${{ vars.REPO_FRONTEND }}:${{ needs.build-job.outputs.IMAGE_TAG }};
-          echo $IMAGE_URL
+          echo "${{ vars.FRONTEND_REGISTRY }}/${{ vars.FRONTEND_REPO }}: ${{ steps.get-commit-tag.outputs.commit-hash }}"
+          echo ${{ env.IMAGE_URL }}
           kustomize edit set image frontend=$IMAGE_URL
 
       - name: Apply the manifests to the cluster
