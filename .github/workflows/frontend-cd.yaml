@@ -97,8 +97,6 @@ jobs:
           dockerfile: starter/frontend/Dockerfile
           context: starter/frontend
           build_args: "REACT_APP_MOVIE_API_URL=${{ vars.REACT_APP_MOVIE_API_URL }}"
-    outputs:
-      IMAG_TAG: ${{ steps.get-commit-tag.outputs.commit-hash }}"
   
   deploy-job:
     name: Deploy job
@@ -140,10 +138,10 @@ jobs:
         run: |
           echo "${{ env.FRONTEND_REGISTRY }}/${{ env.FRONTEND_REPO }}:${{ steps.get-commit-tag.outputs.commit-hash }}"
           echo ${{ env.IMAGE_URL }}
-          kustomize edit set image frontend=$IMAGE_URL
+          kustomize edit set image frontend=$IMAGE_URL && kustomize build | kubectl apply -f -
 
-      - name: Apply the manifests to the cluster
-        working-directory: starter/frontend/k8s
-        run: |
-          kustomize build | kubectl apply -f -
+      # - name: Apply the manifests to the cluster
+      #   working-directory: starter/frontend/k8s
+      #   run: |
+          
           
