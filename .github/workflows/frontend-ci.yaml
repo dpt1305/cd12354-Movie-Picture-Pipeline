@@ -6,13 +6,7 @@ on:
     paths:
       - starter/frontend/**
       - .github/workflows/frontend-ci.yaml
-  push:
-    branches:
-      - fe-ci-2
-      - main
-    paths:
-      - starter/frontend/**
-      - .github/workflows/frontend-ci.yaml
+      
 env:
   NODE_VERSION: 20
   FRONTEND_REPO: "frontend"
@@ -96,32 +90,8 @@ jobs:
           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           registry: ${{ env.FRONTEND_REGISTRY }}
-          # tags: "latest, ${{ steps.get-commit-hash.outputs.commit-hash }}-${{ steps.get-timestamp.outputs.timestamp }}"
           tags: "lastest, ${{ steps.get-commit-tag.outputs.commit-hash }}"
           repo: ${{ env.FRONTEND_REPO }}
           region: us-east-1
           dockerfile: starter/frontend/Dockerfile
           context: starter/frontend
-
-  #     # Step 2: Setup Node.js
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: ${{nodeVersion}}
-
-  #     # Step 3: Restore cache for dependencies
-  #     - name: Cache Node.js modules
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: ~/.npm
-  #         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-node-
-
-  #     # Step 4: Install dependencies
-  #     - name: Install dependencies
-  #       run: npm ci
-
-  #     # Step 5: Build application using Docker
-  #     - name: Build Docker image
-  #       run: docker build -t my-app:latest .
