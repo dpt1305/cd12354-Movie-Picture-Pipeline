@@ -132,8 +132,12 @@ jobs:
       - name: Set the image tag to the newer version
         env:
           IMAGE_URL: ${{ vars.REGISTRY }}/${{ vars.REPO_FRONTEND }}:${{ needs.build-job.outputs.IMAGE_TAG }}
+        run: |
+          echo "${{ env.IMAGE_URL }}"
+          kustomize edit set image frontend=${{ env.IMAGE_URL }}
+
+      - name: Apply the manifests to the cluster
         working-directory: starter/frontend/k8s
         run: |
-          kustomize edit set image frontend=${{ env.IMAGE_URL }}
-          kustomize build 
-          kubectl apply -f -
+          kustomize build && kubectl apply -f -
+          
