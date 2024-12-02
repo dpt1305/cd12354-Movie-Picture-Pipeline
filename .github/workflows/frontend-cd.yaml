@@ -87,7 +87,7 @@ jobs:
       
       - name: Echo BE URL
         run: |
-          echo 'REACT_APP_MOVIE_API_URL=${{ vars.REACT_APP_MOVIE_API_URL_2 }}'
+          echo "REACT_APP_MOVIE_API_URL=${{ vars.REACT_APP_MOVIE_API_URL_2 }}"
       
       - name: Build and upload image to ECR
         uses: appleboy/docker-ecr-action@master
