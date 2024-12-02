@@ -148,6 +148,6 @@ jobs:
       - name: Apply the manifests to the cluster
         working-directory: starter/frontend/k8s
         run: |
-          kustomize build --validate=false | kubectl apply -f -
+          kustomize build  | kubectl apply -f - --validate=false
 
           
