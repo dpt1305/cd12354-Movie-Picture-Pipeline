@@ -101,14 +101,6 @@ jobs:
           dockerfile: starter/frontend/Dockerfile
           context: starter/frontend
           build_args: "REACT_APP_MOVIE_API_URL=${{ vars.REACT_APP_MOVIE_API_URL_2 }}"
-      
-      - name: Cache Docker image
-        uses: actions/cache@v4
-        with:
-          path: ~/docker-cache
-          key: docker-${{ github.sha }}-frontend
-          restore-keys: |
-            docker-${{ github.sha }}-
  
   deploy-job:
     name: Deploy job
