@@ -138,7 +138,7 @@ jobs:
       - name: Set the image tag to the newer version
         working-directory: starter/frontend/k8s
         run: |
-          kustomize edit set image frontend=$FRONTEND_REGISTRY/$FRONTEND_REPO:latest
+          kustomize edit set image frontend=$FRONTEND_REGISTRY/$FRONTEND_REPO:lastest
 
       - name: Apply the manifests to the cluster
         working-directory: starter/frontend/k8s
