@@ -134,12 +134,12 @@ jobs:
           kustomize-version: 5.0.1
 
       - name: Set the image tag to the newer version
-        working-directory: starter/frontend/k8s
+        working-directory: starter/backend/k8s
         run: |
           kustomize edit set image backend=$BACKEND_REGISTRY/$BACKEND_REPO:lastest
 
       - name: Apply the manifests to the cluster
-        working-directory: starter/frontend/k8s
+        working-directory: starter/backend/k8s
         run: |
           kustomize build  | kubectl apply -f - --validate=false
           
