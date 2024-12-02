@@ -145,4 +145,7 @@ jobs:
         run: |
           kustomize build  | kubectl apply -f - --validate=false
 
-          
+      - name: Frontend url
+        run: | 
+          FRONTEND_URL=http://$(kubectl get svc frontend -o jsonpath='{.status.loadBalancer.ingress[0].hostname}:{.spec.ports[0].port}')
+          echo "FRONTEND URL: $FRONTEND_URL"    
