@@ -8,7 +8,7 @@ on:
       - .github/workflows/backend-ci.yaml
 
 env:
-  PYTHON_VERSION: '3.10' 
+  PYTHON_VERSION: "3.10" 
   BACKEND_REPO: "backend"
   BACKEND_REGISTRY: "918780285974.dkr.ecr.us-east-1.amazonaws.com"
 
