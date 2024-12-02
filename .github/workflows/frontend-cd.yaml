@@ -87,7 +87,7 @@ jobs:
       
       - name: Echo BE URL
         run: |
-          echo "REACT_APP_MOVIE_API_URL=${{ vars.REACT_APP_MOVIE_API_URL_2 }}"
+          echo "REACT_APP_MOVIE_API_URL=${{ vars.REACT_APP_MOVIE_API_URL }}"
       
       - name: Build and upload image to ECR
         uses: appleboy/docker-ecr-action@master
@@ -100,7 +100,7 @@ jobs:
           region: us-east-1
           dockerfile: starter/frontend/Dockerfile
           context: starter/frontend
-          build_args: "REACT_APP_MOVIE_API_URL=${{ vars.REACT_APP_MOVIE_API_URL_2 }}"
+          build_args: "REACT_APP_MOVIE_API_URL=${{ vars.REACT_APP_MOVIE_API_URL }}"
  
   deploy-job:
     name: Deploy job
