@@ -102,7 +102,8 @@ jobs:
       - name: Build and Push docker image to ECR
         working-directory: starter/frontend
         run: |
-          docker build -t $FRONTEND_REGISTRY/$FRONTEND_REPO:lastest -t $FRONTEND_REGISTRY/$FRONTEND_REPO:${{ steps.get-commit-tag.outputs.commit-hash }} --build-arg=REACT_APP_MOVIE_API_URL=${{ vars.REACT_APP_MOVIE_API_URL }} .
+          docker build -t $FRONTEND_REGISTRY/$FRONTEND_REPO:lastest --build-arg=REACT_APP_MOVIE_API_URL=${{ vars.REACT_APP_MOVIE_API_URL }} .
+          docker image tag $FRONTEND_REGISTRY/$FRONTEND_REPO $FRONTEND_REGISTRY/$FRONTEND_REPO:${{ steps.get-commit-tag.outputs.commit-hash }} 
           docker images
           docker push $FRONTEND_REGISTRY/$FRONTEND_REPO:lastest
       
