@@ -6,7 +6,7 @@ on:
     paths:
       - starter/frontend/**
       - .github/workflows/frontend-cd.yaml
-      
+
 env:
   NODE_VERSION: 20
   FRONTEND_REPO: "frontend"
