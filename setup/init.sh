@@ -1,8 +1,11 @@
 #!/bin/bash
 set -e -o pipefail
 
+# Update kubeconfig
+aws eks update-kubeconfig --region us-east-1 --name cluster --profile uda2;
+
 echo "Fetching IAM github-action-user ARN"
-userarn=$(aws iam get-user --user-name github-action-user | jq -r .User.Arn)
+userarn=$(aws iam get-user --profile uda2 --user-name github-action-user | jq -r .User.Arn)
 
 # Download tool for manipulating aws-auth
 echo "Downloading tool..."
