@@ -147,3 +147,4 @@ jobs:
         run: | 
           BACKEND_URL=http://$(kubectl get svc backend -o jsonpath='{.status.loadBalancer.ingress[0].hostname}:{.spec.ports[0].port}')
           echo "BACKEND URL: $BACKEND_URL"    
+ 
