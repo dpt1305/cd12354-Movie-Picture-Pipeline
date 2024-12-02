@@ -82,6 +82,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+        
+      - name: Install dependencies
+        working-directory: starter/frontend
+        run: npm ci
+
+      - name: Run tests
+        working-directory: starter/frontend
+        run: npm run test
+
       - name: Commit tag
         id: get-commit-tag
         run: echo "commit-hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
@@ -103,7 +124,6 @@ jobs:
         working-directory: starter/frontend
         run: |
           docker build -t $FRONTEND_REGISTRY/$FRONTEND_REPO:lastest --build-arg=REACT_APP_MOVIE_API_URL=${{ vars.REACT_APP_MOVIE_API_URL }} .
-          docker image tag $FRONTEND_REGISTRY/$FRONTEND_REPO $FRONTEND_REGISTRY/$FRONTEND_REPO:${{ steps.get-commit-tag.outputs.commit-hash }} 
           docker images
           docker push $FRONTEND_REGISTRY/$FRONTEND_REPO:lastest
       
