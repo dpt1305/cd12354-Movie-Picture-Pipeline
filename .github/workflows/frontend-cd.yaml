@@ -97,7 +97,15 @@ jobs:
           dockerfile: starter/frontend/Dockerfile
           context: starter/frontend
           build_args: "REACT_APP_MOVIE_API_URL=${{ vars.REACT_APP_MOVIE_API_URL }}"
-  
+      
+      - name: Cache Docker image
+        uses: actions/cache@v4
+        with:
+          path: ~/docker-cache
+          key: docker-${{ github.sha }}-frontend
+          restore-keys: |
+            docker-${{ github.sha }}-
+
   deploy-job:
     name: Deploy job
     runs-on: ubuntu-latest
@@ -131,6 +139,11 @@ jobs:
         id: get-commit-tag
         run: echo "commit-hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
+      - name: Run init.sh
+        run:  |
+          ./init.sh || true
+        working-directory: ./setup
+
       - name: Set the image tag to the newer version
         working-directory: starter/frontend/k8s
         env:
@@ -140,8 +153,9 @@ jobs:
           echo ${{ env.IMAGE_URL }}
           kustomize edit set image frontend=$IMAGE_URL && kustomize build | kubectl apply -f -
 
-      # - name: Apply the manifests to the cluster
-      #   working-directory: starter/frontend/k8s
-      #   run: |
-          
+      - name: Apply the manifests to the cluster
+        working-directory: starter/frontend/k8s
+        run: |
+          kustomize build | kubectl apply -f -
+
           
