@@ -100,14 +100,11 @@ jobs:
           mask-password: "true"
 
       - name: Build and Push docker image to ECR
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: frontend
-          IMAGE_TAG: latest
+        working-directory: starter/frontend
         run: |
-          docker build -t $REGISTRY/$REPOSITORY:lastest -t $REGISTRY/$REPOSITORY:${{ steps.get-commit-tag.outputs.commit-hash }} --build-arg=REACT_APP_MOVIE_API_URL=${{ vars.REACT_APP_MOVIE_API_URL }} .
+          docker build -t $FRONTEND_REGISTRY/$FRONTEND_REPO:lastest -t $FRONTEND_REGISTRY/$FRONTEND_REPO:${{ steps.get-commit-tag.outputs.commit-hash }} --build-arg=REACT_APP_MOVIE_API_URL=${{ vars.REACT_APP_MOVIE_API_URL }} .
           docker images
-          docker push $REGISTRY/$REPOSITORY:lastest
+          docker push $FRONTEND_REGISTRY/$FRONTEND_REPO:lastest
       
       # - name: Build and upload image to ECR
       #   uses: appleboy/docker-ecr-action@master
