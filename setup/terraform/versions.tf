@@ -1,5 +1,7 @@
 provider "aws" {
   region = "us-east-1"
+  profile = "uda2"
+  shared_credentials_files = ["~/.aws/credentials"]
 }
 
 terraform {

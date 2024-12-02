@@ -73,45 +73,45 @@ resource "aws_route_table_association" "private" {
 }
 
 # Create EKS endpoint for private access
-resource "aws_vpc_endpoint" "eks" {
-  count               = var.enable_private == true ? 1 : 0 # only enable when private
-  vpc_id              = aws_vpc.vpc.id
-  service_name        = "com.amazonaws.us-east-1.eks"
-  vpc_endpoint_type   = "Interface"
-  security_group_ids  = [aws_eks_cluster.main.vpc_config.0.cluster_security_group_id]
-  subnet_ids          = [aws_subnet.private_subnet.id]
-  private_dns_enabled = true
-}
+# resource "aws_vpc_endpoint" "eks" {
+#   count               = var.enable_private == true ? 1 : 0 # only enable when private
+#   vpc_id              = aws_vpc.vpc.id
+#   service_name        = "com.amazonaws.us-east-1.eks"
+#   vpc_endpoint_type   = "Interface"
+#   security_group_ids  = [aws_eks_cluster.main.vpc_config.0.cluster_security_group_id]
+#   subnet_ids          = [aws_subnet.private_subnet.id]
+#   private_dns_enabled = true
+# }
 
 # Create EC2 endpoint for private access
-resource "aws_vpc_endpoint" "ec2" {
-  count               = var.enable_private == true ? 1 : 0
-  vpc_id              = aws_vpc.vpc.id
-  service_name        = "com.amazonaws.us-east-1.ec2"
-  vpc_endpoint_type   = "Interface"
-  security_group_ids  = [aws_eks_cluster.main.vpc_config.0.cluster_security_group_id]
-  private_dns_enabled = true
-}
+# resource "aws_vpc_endpoint" "ec2" {
+#   count               = var.enable_private == true ? 1 : 0
+#   vpc_id              = aws_vpc.vpc.id
+#   service_name        = "com.amazonaws.us-east-1.ec2"
+#   vpc_endpoint_type   = "Interface"
+#   security_group_ids  = [aws_eks_cluster.main.vpc_config.0.cluster_security_group_id]
+#   private_dns_enabled = true
+# }
 
-resource "aws_vpc_endpoint" "ecr-dkr-endpoint" {
-  count               = var.enable_private == true ? 1 : 0
-  vpc_id              = aws_vpc.vpc.id
-  service_name        = "com.amazonaws.us-east-1.ecr.dkr"
-  vpc_endpoint_type   = "Interface"
-  security_group_ids  = [aws_eks_cluster.main.vpc_config.0.cluster_security_group_id]
-  subnet_ids          = [aws_subnet.private_subnet.id]
-  private_dns_enabled = true
-}
+# resource "aws_vpc_endpoint" "ecr-dkr-endpoint" {
+#   count               = var.enable_private == true ? 1 : 0
+#   vpc_id              = aws_vpc.vpc.id
+#   service_name        = "com.amazonaws.us-east-1.ecr.dkr"
+#   vpc_endpoint_type   = "Interface"
+#   security_group_ids  = [aws_eks_cluster.main.vpc_config.0.cluster_security_group_id]
+#   subnet_ids          = [aws_subnet.private_subnet.id]
+#   private_dns_enabled = true
+# }
 
-resource "aws_vpc_endpoint" "ecr-api-endpoint" {
-  count               = var.enable_private == true ? 1 : 0
-  vpc_id              = aws_vpc.vpc.id
-  service_name        = "com.amazonaws.us-east-1.ecr.api"
-  vpc_endpoint_type   = "Interface"
-  security_group_ids  = [aws_eks_cluster.main.vpc_config.0.cluster_security_group_id]
-  subnet_ids          = [aws_subnet.private_subnet.id]
-  private_dns_enabled = true
-}
+# resource "aws_vpc_endpoint" "ecr-api-endpoint" {
+#   count               = var.enable_private == true ? 1 : 0
+#   vpc_id              = aws_vpc.vpc.id
+#   service_name        = "com.amazonaws.us-east-1.ecr.api"
+#   vpc_endpoint_type   = "Interface"
+#   security_group_ids  = [aws_eks_cluster.main.vpc_config.0.cluster_security_group_id]
+#   subnet_ids          = [aws_subnet.private_subnet.id]
+#   private_dns_enabled = true
+# }
 
 ###################
 # ECR Repositories
@@ -140,17 +140,17 @@ resource "aws_ecr_repository" "backend" {
 # EKS Resources
 ################
 # Create an EKS cluster
-resource "aws_eks_cluster" "main" {
-  name     = "cluster"
-  version  = var.k8s_version
-  role_arn = aws_iam_role.eks_cluster.arn
-  vpc_config {
-    subnet_ids              = [aws_subnet.private_subnet.id, aws_subnet.public_subnet.id]
-    endpoint_public_access  = var.enable_private == true ? false : true
-    endpoint_private_access = true
-  }
-  depends_on = [aws_iam_role_policy_attachment.eks_cluster, aws_iam_role_policy_attachment.eks_service]
-}
+# resource "aws_eks_cluster" "main" {
+#   name     = "cluster"
+#   version  = var.k8s_version
+#   role_arn = aws_iam_role.eks_cluster.arn
+#   vpc_config {
+#     subnet_ids              = [aws_subnet.private_subnet.id, aws_subnet.public_subnet.id]
+#     endpoint_public_access  = var.enable_private == true ? false : true
+#     endpoint_private_access = true
+#   }
+#   depends_on = [aws_iam_role_policy_attachment.eks_cluster, aws_iam_role_policy_attachment.eks_service]
+# }
 
 
 # Create an IAM role for the EKS cluster
@@ -187,38 +187,38 @@ resource "aws_iam_role_policy_attachment" "eks_service" {
 # EKS Node Group
 ##################
 # Track latest release for the given k8s version
-data "aws_ssm_parameter" "eks_ami_release_version" {
-  name = "/aws/service/eks/optimized-ami/${aws_eks_cluster.main.version}/amazon-linux-2/recommended/release_version"
-}
+# data "aws_ssm_parameter" "eks_ami_release_version" {
+#   name = "/aws/service/eks/optimized-ami/${aws_eks_cluster.main.version}/amazon-linux-2/recommended/release_version"
+# }
 
-resource "aws_eks_node_group" "main" {
-  node_group_name = "udacity"
-  cluster_name    = aws_eks_cluster.main.name
-  version         = aws_eks_cluster.main.version
-  node_role_arn   = aws_iam_role.node_group.arn
-  subnet_ids      = [var.enable_private == true ? aws_subnet.private_subnet.id : aws_subnet.public_subnet.id]
-  release_version = nonsensitive(data.aws_ssm_parameter.eks_ami_release_version.value)
-  instance_types  = ["t3.small"]
+# resource "aws_eks_node_group" "main" {
+#   node_group_name = "udacity"
+#   cluster_name    = aws_eks_cluster.main.name
+#   version         = aws_eks_cluster.main.version
+#   node_role_arn   = aws_iam_role.node_group.arn
+#   subnet_ids      = [var.enable_private == true ? aws_subnet.private_subnet.id : aws_subnet.public_subnet.id]
+#   release_version = nonsensitive(data.aws_ssm_parameter.eks_ami_release_version.value)
+#   instance_types  = ["t3.small"]
 
-  scaling_config {
-    desired_size = 1
-    max_size     = 1
-    min_size     = 1
-  }
+#   scaling_config {
+#     desired_size = 1
+#     max_size     = 1
+#     min_size     = 1
+#   }
 
 
-  # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
-  # Otherwise, EKS will not be able to properly delete EC2 Instances and Elastic Network Interfaces.
-  depends_on = [
-    aws_iam_role_policy_attachment.node_group_policy,
-    aws_iam_role_policy_attachment.cni_policy,
-    aws_iam_role_policy_attachment.ecr_policy,
-  ]
+#   # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
+#   # Otherwise, EKS will not be able to properly delete EC2 Instances and Elastic Network Interfaces.
+#   depends_on = [
+#     aws_iam_role_policy_attachment.node_group_policy,
+#     aws_iam_role_policy_attachment.cni_policy,
+#     aws_iam_role_policy_attachment.ecr_policy,
+#   ]
 
-  lifecycle {
-    ignore_changes = [scaling_config.0.desired_size]
-  }
-}
+#   lifecycle {
+#     ignore_changes = [scaling_config.0.desired_size]
+#   }
+# }
 
 // IAM Configuration
 resource "aws_iam_role" "node_group" {
